@@ -1,7 +1,5 @@
 ## JS Sequence Diagrams 
 
-----
-
 **[Playground](http://niexiaotao.cn/sequence/)**
 
 Origin repo and doc： [There](https://github.com/bramp/js-sequence-diagrams)
