@@ -24,6 +24,7 @@ Diagram.themes.simple = Diagram.themes.snapSimple || Diagram.themes.raphaelSimpl
 * options (Object)
 */
 Diagram.prototype.drawSVG = function(container, options) {
+  console.log('drawSVG options:', options);
   var defaultOptions = {
     theme: 'hand'
   };

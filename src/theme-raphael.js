@@ -8,7 +8,7 @@
 if (typeof Raphael != 'undefined') {
 
   var LINE = {
-    'stroke': '#000000',
+    'stroke': '#ff0000',
     'stroke-width': 2,
     'fill': 'none'
   };

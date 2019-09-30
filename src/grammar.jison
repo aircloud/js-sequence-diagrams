@@ -26,13 +26,14 @@
 "title"           { this.begin('title'); return 'title'; }
 <title>[^\r\n]+   { this.popState(); return 'MESSAGE'; }
 ","               return ',';
-[^\->:,\r\n"]+    return 'ACTOR';
-\"[^"]+\"         return 'ACTOR';
+[^`\->:,\r\n"]+    return 'ACTOR';
+\"[^`"]+\"         return 'ACTOR';
 "--"              return 'DOTLINE';
 "-"               return 'LINE';
 ">>"              return 'OPENARROW';
 ">"               return 'ARROW';
-:[^\r\n]+         return 'MESSAGE';
+:[^\r\n`]+        return 'MESSAGE';
+\`[^\r\n`]+\`       return 'STYLE';
 <<EOF>>           return 'EOF';
 .                 return 'INVALID';
 
@@ -58,7 +59,7 @@ line
 
 statement
 	: 'participant' actor_alias { $2; }
-	| signal               { yy.parser.yy.addSignal($1); }
+    | signal               { yy.parser.yy.addSignal($1); }
 	| note_statement       { yy.parser.yy.addSignal($1); }
 	| 'title' message      { yy.parser.yy.setTitle($2);  }
 	;
@@ -79,8 +80,8 @@ placement
 	;
 
 signal
-	: actor signaltype actor message
-	{ $$ = new Diagram.Signal($1, $2, $3, $4); }
+	: actor signaltype actor message style { $$ = new Diagram.Signal($1, $2, $3, $4, $5); }
+	| actor signaltype actor message { $$ = new Diagram.Signal($1, $2, $3, $4); }
 	;
 
 actor
@@ -110,5 +111,8 @@ message
 	: MESSAGE { $$ = Diagram.unescape($1.substring(1)); }
 	;
 
+style
+	: STYLE { $$ = $1.substring(1, $1.length - 1); }
+	;
 
 %%

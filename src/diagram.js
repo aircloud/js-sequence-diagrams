@@ -60,13 +60,15 @@ Diagram.Actor = function(alias, name, index) {
   this.index = index;
 };
 
-Diagram.Signal = function(actorA, signaltype, actorB, message) {
+Diagram.Signal = function(actorA, signaltype, actorB, message, styles) {
+  console.log('new Signal:', actorA, signaltype, actorB, message, styles);
   this.type       = 'Signal';
   this.actorA     = actorA;
   this.actorB     = actorB;
   this.linetype   = signaltype & 3;
   this.arrowtype  = (signaltype >> 2) & 3;
   this.message    = message;
+  this.styles     = styles || '';
 };
 
 Diagram.Signal.prototype.isSelf = function() {
@@ -155,6 +157,8 @@ Diagram.parse = function(input) {
 
   // Parse
   var diagram = parser.parse(input);
+
+  console.log('parser result:', diagram);
 
   // Then clean up the parseError key that a user won't care about
   delete diagram.parseError;

@@ -18,6 +18,7 @@
     "uglify-js": "2.8.x"
   },
   "scripts": {
-    "test": "make test"
+    "test": "make test",
+    "dev": "make && cp dist/sequence-diagram.js _site/js/sequence-diagram-snap.js && cp dist/sequence-diagram-snap-min.js _site/js/sequence-diagram-snap-min.js"
   }
 }

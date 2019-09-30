@@ -178,13 +178,26 @@ if (typeof Snap != 'undefined') {
       return t;
     },
 
-    drawLine: function(x1, y1, x2, y2, linetype, arrowhead) {
-      var line = this.paper_.line(x1, y1, x2, y2).attr(LINE);
+    drawLine: function(x1, y1, x2, y2, linetype, arrowhead, styles) {
+        console.log('drawLine styles:', styles);
+        console.log('drawLine:', x1, y1, x2, y2, linetype, arrowhead)
+        var line = this.paper_.line(x1, y1, x2, y2).attr(Object.assign({}, LINE, styles));
       if (linetype !== undefined) {
         line.attr('strokeDasharray', this.lineTypes_[linetype]);
       }
+      var subarrow;
       if (arrowhead !== undefined) {
-        line.attr('markerEnd', this.arrowMarkers_[arrowhead]);
+          console.log('arrowhead', arrowhead);
+          if(ARROWTYPE.FILLED === arrowhead) {
+              subarrow = this.paper_.path('M 0 0 L 5 2.5 L 0 5 z');
+              line.attr('markerEnd', subarrow.marker(0, 0, 5, 5, 5, 2.5)
+                  .attr(styles || {}));
+          }
+          if(ARROWTYPE.OPEN === arrowhead) {
+              subarrow = this.paper_.path('M 9.6,8 1.92,16 0,13.7 5.76,8 0,2.286 1.92,0 9.6,8 z');
+              line.attr('markerEnd', subarrow.marker(0, 0, 9.6, 16, 9.6, 8)
+                  .attr(Object.assign({markerWidth: '4'}, styles || {})));
+          }
       }
       return this.pushToStack(line);
     },
@@ -201,8 +214,10 @@ if (typeof Snap != 'undefined') {
      * font (Object)
      * align (string) ALIGN_LEFT, ALIGN_CENTER, ALIGN_HORIZONTAL_CENTER or ALIGN_VERTICAL_CENTER
      */
-    drawText: function(x, y, text, font, align) {
-      var t = this.createText(text, font);
+    drawText: function(x, y, text, font, align, styles) {
+        console.log('drawText:', x, y, text, font, align);
+
+        var t = this.createText(text, font);
       var bb = t.getBBox();
 
       if (align == ALIGN_CENTER || align == ALIGN_HORIZONTAL_CENTER) {
@@ -211,10 +226,11 @@ if (typeof Snap != 'undefined') {
       if (align == ALIGN_CENTER || align == ALIGN_VERTICAL_CENTER) {
         y = y - bb.height / 2;
       }
+        console.log('drawText Style:', Object.assign({x: x - bb.x, y: y - bb.y}, styles))
 
       // Now move the text into place
       // `y - bb.y` because text(..) is positioned from the baseline, so this moves it down.
-      t.attr({x: x - bb.x, y: y - bb.y});
+      t.attr(Object.assign({x: x - bb.x, y: y - bb.y}, styles));
       t.selectAll('tspan').attr({x: x});
 
       this.pushToStack(t);
@@ -268,13 +284,24 @@ if (typeof Snap != 'undefined') {
 
   // Take the standard SnapTheme and make all the lines wobbly
   _.extend(SnapHandTheme.prototype, SnapTheme.prototype, {
-    drawLine: function(x1, y1, x2, y2, linetype, arrowhead) {
-      var line = this.paper_.path(handLine(x1, y1, x2, y2)).attr(LINE);
-      if (linetype !== undefined) {
+    drawLine: function(x1, y1, x2, y2, linetype, arrowhead, styles) {
+        console.log('drawLine styles:', styles);
+        var line = this.paper_.line(x1, y1, x2, y2).attr(Object.assign({}, LINE, styles));
+        var subarrow;
+        if (linetype !== undefined) {
         line.attr('strokeDasharray', this.lineTypes_[linetype]);
       }
       if (arrowhead !== undefined) {
-        line.attr('markerEnd', this.arrowMarkers_[arrowhead]);
+          if(ARROWTYPE.FILLED === arrowhead) {
+              subarrow = this.paper_.path('M 0 0 L 5 2.5 L 0 5 z');
+              line.attr('markerEnd', subarrow.marker(0, 0, 5, 5, 5, 2.5)
+                  .attr(styles || {}));
+          }
+          if(ARROWTYPE.OPEN === arrowhead) {
+              subarrow = this.paper_.path('M 9.6,8 1.92,16 0,13.7 5.76,8 0,2.286 1.92,0 9.6,8 z');
+              line.attr('markerEnd', subarrow.marker(0, 0, 9.6, 16, 9.6, 8)
+                  .attr(Object.assign({markerWidth: '4'}, styles || {})));
+          }
       }
       return this.pushToStack(line);
     },

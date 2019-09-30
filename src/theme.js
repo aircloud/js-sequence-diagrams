@@ -140,10 +140,18 @@ function handLine(x1, y1, x2, y2) {
   return 'M' + x1.toFixed(1) + ',' + y1.toFixed(1) + wobble(x1, y1, x2, y2);
 }
 
+function parseStyle(rawStyle) {
+  var styleObj = JSON.parse(rawStyle);
+  if (styleObj.color) {
+    styleObj.stroke = styleObj.color;
+    styleObj.fill = styleObj.color;
+  }
+  return styleObj;
+}
+
 /******************
  * BaseTheme
  ******************/
-
 var BaseTheme = function(diagram, options) {
   this.init(diagram, options);
 };
@@ -380,6 +388,8 @@ _.extend(BaseTheme.prototype, {
   },
 
   drawSelfSignal: function(signal, offsetY) {
+    console.log('drawSelfSignal:', signal, offsetY);
+
     assert(signal.isSelf(), 'signal must be a self signal');
 
     var textBB = signal.textBB;
@@ -388,10 +398,16 @@ _.extend(BaseTheme.prototype, {
     var y1 = offsetY + SIGNAL_MARGIN + SIGNAL_PADDING;
     var y2 = y1 + signal.height - 2 * SIGNAL_MARGIN - SIGNAL_PADDING;
 
+    var styles;
+    try {
+      styles = parseStyle(signal.styles || '{}');
+    } catch (e) {
+    }
+
     // Draw three lines, the last one with a arrow
-    this.drawLine(aX, y1, aX + SELF_SIGNAL_WIDTH, y1, signal.linetype);
-    this.drawLine(aX + SELF_SIGNAL_WIDTH, y1, aX + SELF_SIGNAL_WIDTH, y2, signal.linetype);
-    this.drawLine(aX + SELF_SIGNAL_WIDTH, y2, aX, y2, signal.linetype, signal.arrowtype);
+    this.drawLine(aX, y1, aX + SELF_SIGNAL_WIDTH, y1, signal.linetype, null, styles);
+    this.drawLine(aX + SELF_SIGNAL_WIDTH, y1, aX + SELF_SIGNAL_WIDTH, y2, signal.linetype, null, styles);
+    this.drawLine(aX + SELF_SIGNAL_WIDTH, y2, aX, y2, signal.linetype, signal.arrowtype, styles);
 
     // Draw text
     var x = aX + SELF_SIGNAL_WIDTH + SIGNAL_PADDING;
@@ -400,10 +416,11 @@ _.extend(BaseTheme.prototype, {
     var topPadding = emptyVerticalSpace / 2;
     var y = y1 + topPadding;
 
-    this.drawText(x, y, signal.message, this.font_, ALIGN_LEFT);
+    this.drawText(x, y, signal.message, this.font_, ALIGN_LEFT, styles);
   },
 
   drawSignal: function(signal, offsetY) {
+    console.log('drawSignal:', signal, offsetY);
     var aX = getCenterX(signal.actorA);
     var bX = getCenterX(signal.actorB);
 
@@ -411,14 +428,20 @@ _.extend(BaseTheme.prototype, {
     var x = (bX - aX) / 2 + aX;
     var y = offsetY + SIGNAL_MARGIN + SIGNAL_PADDING;
 
+    var styles;
+    try {
+      styles = parseStyle(signal.styles || '{}');
+    } catch (e) {
+    }
+
     // Draw the text in the middle of the signal
-    this.drawText(x, y, signal.message, this.font_, ALIGN_HORIZONTAL_CENTER);
+    this.drawText(x, y, signal.message, this.font_, ALIGN_HORIZONTAL_CENTER, styles);
 
     // Draw the line along the bottom of the signal
     // Padding above, between message and line
     // Margin below the line, between line and next signal
     y = offsetY + signal.height - SIGNAL_PADDING;
-    this.drawLine(aX, y, bX, y, signal.linetype, signal.arrowtype);
+    this.drawLine(aX, y, bX, y, signal.linetype, signal.arrowtype, styles);
   },
 
   drawNote: function(note, offsetY) {

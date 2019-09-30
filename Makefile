@@ -36,9 +36,6 @@ lint: dependencies package.json bower.json
 	$(NODE_MODULES)/jsonlint package.json -q
 	$(NODE_MODULES)/jsonlint bower.json -q
 
-	$(NODE_MODULES)/eslint src/*.js
-	$(NODE_MODULES)/eslint test/*.js
-
 test: dependencies dist/sequence-diagram-min.js
 
 	# Test the un-minifed file (with underscore)
